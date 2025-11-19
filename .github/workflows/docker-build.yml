@@ -1,28 +1,34 @@
-name: Build and Push Docker Image
+name: Docker CI/CD
 
+# Trigger workflow on push to main
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      # 1. Checkout the repo
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to DockerHub
+      # 2. Log in to Docker Hub
+      - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and Push
-        uses: docker/build-push-action@v5
-        with:
-          push: true
-          tags: tini3393/devops-sop-site:latest
+      # 3. Build Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t tini3393/devops-sop-site:latest .
+
+      # 4. Push Docker image
+      - name: Push Docker image
+        run: |
+          docker push tini3393/devops-sop-site:latest
+
